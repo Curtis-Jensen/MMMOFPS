@@ -11,6 +11,9 @@ namespace Unity.FPS.UI
         [Tooltip("Root GameObject of the menu used to toggle its activation")]
         public GameObject MenuRoot;
 
+        [Tooltip("Room menu GameObject to show when pausing")]
+        public GameObject RoomMenu;
+
         [Tooltip("Master volume when menu is open")] [Range(0.001f, 1f)]
         public float VolumeWhenMenuOpen = 0.5f;
 
@@ -106,6 +109,10 @@ namespace Unity.FPS.UI
         void SetPauseMenuActivation(bool active)
         {
             MenuRoot.SetActive(active);
+            if (RoomMenu != null)
+            {
+                RoomMenu.SetActive(active);
+            }
 
             if (MenuRoot.activeSelf)
             {
