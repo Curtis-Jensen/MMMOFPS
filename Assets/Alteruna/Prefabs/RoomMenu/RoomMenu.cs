@@ -30,6 +30,10 @@ namespace Alteruna
 		private int _roomI = -1;
 
 
+		/// <summary>
+		/// Initializes the room menu UI and event listeners.
+		/// Finds the Multiplayer component, sets up button listeners, and displays connection status.
+		/// </summary>
 		private void Start()
 		{
 			if (Multiplayer == null)
@@ -91,6 +95,10 @@ namespace Alteruna
 			LeaveButton.interactable = false;
 		}
 
+		/// <summary>
+		/// Updates the connection status text and automatically refreshes the room list at regular intervals.
+		/// Displays animated "Connecting..." text and error messages when not connected.
+		/// </summary>
 		private void FixedUpdate()
 		{
 			if (!Multiplayer.enabled)
@@ -144,6 +152,12 @@ namespace Alteruna
 			}
 		}
 
+		/// <summary>
+		/// Attempts to join a room by name from the available rooms list.
+		/// </summary>
+		/// <param name="roomName">The name of the room to join (case-insensitive)</param>
+		/// <param name="password">Optional password for the room</param>
+		/// <returns>True if the room was found and join was attempted, false otherwise</returns>
 		public bool JoinRoom(string roomName, ushort password = 0)
 		{
 			roomName = roomName.ToLower();
@@ -162,6 +176,10 @@ namespace Alteruna
 			return false;
 		}
 
+		/// <summary>
+		/// Called when the multiplayer connection is established.
+		/// Enables the Start button and checks if already in a room.
+		/// </summary>
 		private void Connected(Multiplayer multiplayer, Endpoint endpoint)
 		{
 			// if already connected to room
@@ -180,6 +198,10 @@ namespace Alteruna
 			}
 		}
 
+		/// <summary>
+		/// Called when the multiplayer connection is lost.
+		/// Disables buttons and updates the status message to "Reconnecting".
+		/// </summary>
 		private void Disconnected(Multiplayer multiplayer, Endpoint endPoint)
 		{
 			StartButton.interactable = false;
@@ -192,6 +214,10 @@ namespace Alteruna
 			}
 		}
 
+		/// <summary>
+		/// Called when the local player successfully joins a room.
+		/// Disables the Start button and enables the Leave button, updates the title with room name.
+		/// </summary>
 		private void JoinedRoom(Multiplayer multiplayer, Room room, User user)
 		{
 			StartButton.interactable = false;
@@ -203,6 +229,10 @@ namespace Alteruna
 			}
 		}
 
+		/// <summary>
+		/// Called when the local player leaves a room.
+		/// Re-enables the Start button and disables the Leave button.
+		/// </summary>
 		private void LeftRoom(Multiplayer multiplayer)
 		{
 			_roomI = -1;
@@ -216,6 +246,10 @@ namespace Alteruna
 			}
 		}
 
+		/// <summary>
+		/// Updates the room list UI with available rooms from the multiplayer backend.
+		/// Creates room buttons, filters private/locked/full rooms, and handles room joining.
+		/// </summary>
 		private void UpdateList(Multiplayer multiplayer)
 		{
 			if (ContentContainer == null) return;
@@ -291,6 +325,10 @@ namespace Alteruna
 			}
 		}
 
+		/// <summary>
+		/// Removes UI room objects that are no longer in the available rooms list.
+		/// Keeps the displayed rooms in sync with the backend room list.
+		/// </summary>
 		private void RemoveExtraRooms(Multiplayer multiplayer)
 		{
 			int l = _roomObjects.Count;
@@ -310,6 +348,10 @@ namespace Alteruna
 			}
 		}
 
+		/// <summary>
+		/// Resets the room menu to its default state and ensures the event system is available.
+		/// Called by Unity Editor when resetting component defaults.
+		/// </summary>
 		public new void Reset()
 		{
 			base.Reset();
