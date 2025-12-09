@@ -9,7 +9,12 @@ namespace Unity.FPS.Game
 {
     public class CustomOnlineManager : MonoBehaviour
     {
-        public string hostIp = "127.0.0.1";
+        [Tooltip("IP address clients use to connect to this host. Use 0.0.0.0 to listen on all interfaces.")]
+        public string hostIp = "0.0.0.0";
+        
+        [Tooltip("For clients: IP address of the host to connect to. For local testing use 127.0.0.1")]
+        public string remoteHostIp = "127.0.0.1";
+        
         public int port = 7777;
 
         private bool isHost = false;
@@ -25,58 +30,19 @@ namespace Unity.FPS.Game
 
         private void Start()
         {
-            // Try to connect as a client first to see if a host already exists
-            if (TryConnectAsClient())
+            // Try to become host first by binding to the port
+            if (TryBecomeHost())
             {
-                isHost = false;
-                Debug.Log("Connected as client to existing host");
-                StartClientReceiveLoop();
+                isHost = true;
+                Debug.Log("Became host (successfully bound to port)");
+                StartHostReceiveLoop();
             }
             else
             {
-                // No host found, try to become the host
-                if (TryBecomeHost())
-                {
-                    isHost = true;
-                    Debug.Log("Became host (no existing host found)");
-                    StartHostReceiveLoop();
-                }
-                else
-                {
-                    Debug.LogError("Failed to become host and could not connect to existing host");
-                }
-            }
-        }
-
-        private bool TryConnectAsClient()
-        {
-            try
-            {
-                udp = new UdpClient();
-                remoteEndPoint = new IPEndPoint(IPAddress.Parse(hostIp), port);
-
-                Debug.Log($"Attempting to connect as client to {hostIp}:{port}");
-
-                running = true;
-                
-                // Send a test message to see if host responds
-                byte[] testData = Encoding.UTF8.GetBytes("PING");
-                udp.Send(testData, testData.Length, remoteEndPoint);
-
-                // Try to receive with a timeout to see if host responds
-                udp.Client.ReceiveTimeout = 2000; // 2 second timeout
-                IPEndPoint any = new IPEndPoint(IPAddress.Any, 0);
-                byte[] response = udp.Receive(ref any);
-                
-                udp.Client.ReceiveTimeout = 0; // Reset to blocking
-                return true;
-            }
-            catch
-            {
-                // No host available
-                running = false;
-                try { udp?.Close(); } catch { }
-                return false;
+                // Failed to bind, so become a client
+                isHost = false;
+                Debug.Log("Failed to bind to port, becoming client");
+                StartClient();
             }
         }
 
@@ -85,7 +51,7 @@ namespace Unity.FPS.Game
             try
             {
                 udp = new UdpClient(port);
-                udp.Client.Blocking = true;
+                udp.Client.Blocking = false; // Non-blocking mode
 
                 Debug.Log($"Host started on port {port}");
 
@@ -94,13 +60,35 @@ namespace Unity.FPS.Game
             }
             catch (SocketException se) when (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
             {
-                Debug.LogWarning($"Port {port} already in use (host is running elsewhere)");
+                Debug.LogWarning($"Port {port} already in use (another host is running)");
                 return false;
             }
             catch (Exception e)
             {
                 Debug.LogError($"Failed to become host: {e}");
                 return false;
+            }
+        }
+
+        private void StartClient()
+        {
+            try
+            {
+                udp = new UdpClient();
+                remoteEndPoint = new IPEndPoint(IPAddress.Parse(remoteHostIp), port);
+
+                Debug.Log($"Client started. Target host {remoteHostIp}:{port}");
+
+                running = true;
+                
+                // Send initial connect message
+                SendToServer("CONNECT");
+                
+                StartClientReceiveLoop();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError($"Client start failed: {e}");
             }
         }
 
@@ -126,14 +114,22 @@ namespace Unity.FPS.Game
             {
                 try
                 {
-                    byte[] data = udp.Receive(ref any);
-                    string text = Encoding.UTF8.GetString(data);
+                    // Non-blocking receive
+                    if (udp.Available > 0)
+                    {
+                        byte[] data = udp.Receive(ref any);
+                        string text = Encoding.UTF8.GetString(data);
 
-                    // For now just log and echo back
-                    Debug.Log($"[HOST] From {any}: {text}");
+                        Debug.Log($"[HOST] From {any}: {text}");
 
-                    byte[] response = Encoding.UTF8.GetBytes("ACK:" + text);
-                    udp.Send(response, response.Length, any);
+                        // Always respond to keep connection alive
+                        byte[] response = Encoding.UTF8.GetBytes("ACK:" + text);
+                        udp.Send(response, response.Length, any);
+                    }
+                    else
+                    {
+                        Thread.Sleep(10); // Small delay to prevent busy waiting
+                    }
                 }
                 catch (SocketException)
                 {
@@ -211,6 +207,8 @@ namespace Unity.FPS.Game
                 Debug.LogError($"SendFromHost error: {e}");
             }
         }
+
+        public bool IsHost => isHost;
 
         private void OnApplicationQuit()
         {
