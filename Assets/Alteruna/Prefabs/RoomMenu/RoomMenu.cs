@@ -4,6 +4,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Alteruna.Trinity;
 
+// 🚨TECH DEBT TODO🚨: Move Things out of Monobehavior "timing" methods
 namespace Alteruna
 {
 	public class RoomMenu : CommunicationBridge
@@ -348,10 +349,6 @@ namespace Alteruna
 			}
 		}
 
-		/// <summary>
-		/// Resets the room menu to its default state and ensures the event system is available.
-		/// Called by Unity Editor when resetting component defaults.
-		/// </summary>
 		public new void Reset()
 		{
 			base.Reset();
