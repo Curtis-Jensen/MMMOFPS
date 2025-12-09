@@ -279,6 +279,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a08860ef3e4ec43a5b501d9e0e47ccbe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pvCache: {fileID: 0}
 --- !u!114 &405043160
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -295,91 +296,118 @@ MonoBehaviour:
   Buckets:
   - Name: Min
     NetLOD: 0
-    Users: 
+    Users: []
   - Name: Low
     NetLOD: 1
-    Users: 
+    Users: []
   - Name: Mid
     NetLOD: 2
-    Users: 
+    Users: []
   - Name: High
     NetLOD: 3
-    Users: 
+    Users: []
   - Name: Max
     NetLOD: 4
-    Users: 
+    Users: []
   _maxPlayers: 10
   AvatarSpawning: 0
   AvatarPrefab: {fileID: 0}
   AvatarSpawnLocation: {fileID: 0}
   SpawnAvatarPerIndex: 0
+  d: 0
   AvatarSpawnLocations: []
   OnConnected:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnDisconnected:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnNetworkError:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnRoomCreated:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnRoomJoined:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnRoomLeft:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnRoomListUpdated:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnOtherUserJoined:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnOtherUserLeft:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnJoinRejected:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnPacketSent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnPacketReceived:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnLockRequested:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnLockAcquired:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnLockDenied:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnLockUnlocked:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnForceSynced:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnForceSync:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnRpcReceived:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnRpcSent:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnRpcRegistered:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
   OnForceSyncReply:
     m_PersistentCalls:
       m_Calls: []
+    m_CallsDirty: 1
+  _locallySpawnedAvatar: {fileID: 0}
+  i: 0
+  j: 0
+  l: []
   DevClientIndex: 0
   DevClientName: DevClient0
   UseKnownDevDevice: 0
@@ -3214,6 +3242,11 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
+    - target: {fileID: 7253983127304857660, guid: 761cdc9e4e883334cbdcea062d0befa7,
+        type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 7267769575523271762, guid: 761cdc9e4e883334cbdcea062d0befa7,
         type: 3}
       propertyPath: m_Materials.Array.size
@@ -3312,10 +3345,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 627855c7f81362d41938ffe0b1475957, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  pvCache: {fileID: 0}
+  m_Distance: 0
+  m_Angle: 0
+  m_Direction: {x: 0, y: 0, z: 0}
+  m_NetworkPosition: {x: 0, y: 0, z: 0}
+  m_StoredPosition: {x: 0, y: 0, z: 0}
+  m_NetworkRotation: {x: 0, y: 0, z: 0, w: 0}
   m_SynchronizePosition: 1
   m_SynchronizeRotation: 1
   m_SynchronizeScale: 0
   m_UseLocal: 1
+  m_firstTake: 0
 --- !u!114 &2729281214152228935
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3332,13 +3373,19 @@ MonoBehaviour:
   Group: 0
   prefixField: -1
   Synchronization: 3
+  mixedModeIsReliable: 0
   OwnershipTransfer: 0
   observableSearch: 2
   ObservedComponents:
   - {fileID: 2729281214152228934}
+  RpcMonoBehaviours: []
+  <IsMine>k__BackingField: 0
+  <CreatorActorNr>k__BackingField: 0
+  <AmOwner>k__BackingField: 0
   sceneViewId: 1
   InstantiationId: 0
   isRuntimeInstantiated: 0
+  removedFromLocalViewList: 0
 --- !u!1001 &2729281214182533258
 PrefabInstance:
   m_ObjectHideFlags: 0
