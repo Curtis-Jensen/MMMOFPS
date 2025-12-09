@@ -903,7 +903,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: facdba76ae38a44c5b87307ea842e1fd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  hostIp: 127.0.0.1
+  hostIp: 2001:4860:7:f0e::fb
   port: 7777
 --- !u!4 &1387056974
 Transform:
