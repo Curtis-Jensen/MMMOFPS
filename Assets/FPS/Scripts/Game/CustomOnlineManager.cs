@@ -9,18 +9,33 @@ namespace Unity.FPS.Game
 {
     public class CustomOnlineManager : MonoBehaviour
     {
-        public bool isHost = false;        // Set this true for the first player (the host)
         public string hostIp = "127.0.0.1";
         public int port = 7777;
 
+        private bool isHost = false;
         private UdpClient udp;
         private IPEndPoint remoteEndPoint;
         private Thread receiveThread;
         private bool running;
 
+        private static CustomOnlineManager hostInstance;
+
         private void Awake()
         {
             DontDestroyOnLoad(gameObject);
+            
+            // Auto-detect if we should be the host
+            if (hostInstance == null)
+            {
+                isHost = true;
+                hostInstance = this;
+                Debug.Log("Becoming host (no existing host found)");
+            }
+            else
+            {
+                isHost = false;
+                Debug.Log("Host already exists, becoming client");
+            }
         }
 
         private void Start()
@@ -48,6 +63,13 @@ namespace Unity.FPS.Game
                 receiveThread = new Thread(ReceiveLoopHost);
                 receiveThread.IsBackground = true;
                 receiveThread.Start();
+            }
+            catch (SocketException se) when (se.SocketErrorCode == SocketError.AddressAlreadyInUse)
+            {
+                Debug.LogWarning($"Port {port} already in use. Becoming client instead.");
+                isHost = false;
+                hostInstance = null;
+                StartClient();
             }
             catch (Exception e)
             {
@@ -185,6 +207,12 @@ namespace Unity.FPS.Game
         private void Shutdown()
         {
             running = false;
+
+            // Clear host instance if this was the host
+            if (isHost && hostInstance == this)
+            {
+                hostInstance = null;
+            }
 
             try
             {
